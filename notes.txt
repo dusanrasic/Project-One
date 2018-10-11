@@ -1,0 +1,9 @@
+// TO DO
+*stateless component / stateful
+* redux / context api
+* redux axios (asinhroni) / fetch
+** redux -> decorator
+* lodash (map, ..) native es6,map,reduce,splice,
+* rest i spred operatore
+* early return
+* destructoring objekata i nizova
