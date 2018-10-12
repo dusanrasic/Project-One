@@ -1,0 +1,47 @@
+.Body{
+	position: relative;
+	width: 80vw;
+	height: 92vh;
+	background-color: aqua;
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	box-sizing: border-box;
+	padding: 10px;
+}
+.wrapper{
+	width: 80vw;
+	height: 92vh;
+	background-color: blueviolet;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+	box-sizing: border-box;
+}
+.wrapper .row1{
+	width: 100%;
+	height: 10%;
+	background-color: aliceblue;
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+}
+.wrapper .row1 input{
+	height: 30px;
+	border-radius: 7px;
+	box-sizing: border-box;
+	margin: 0 20px 0 5px;
+}
+.wrapper .row1 button{
+	height: 30px;
+	width: 80px;
+	color: white;
+	border-radius: 7px;
+	background-color: #55AF55;
+}
+.wrapper .row2{
+	width: 100%;
+	height: 90%;
+	background-color: red;
+}

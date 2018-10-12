@@ -1,0 +1,21 @@
+.Navigation{
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 8vh;
+	background-color: #2F2F2F;
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	box-sizing: border-box;
+	padding-left: 10vw;
+}
+.Navigation .App-link{
+	color: gray;
+	text-decoration: none;
+	font-size: 2em;
+}
+.Navigation .App-link:hover{
+	text-shadow: 1px 1px gray;
+}
