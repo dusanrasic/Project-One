@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import '../styles/Body.css';
+import Items from './Items';
 
 class Body extends Component{
 	constructor(){
@@ -19,7 +20,7 @@ class Body extends Component{
 						</form>
 					</div>
 					<div className="row2">
-
+						<Items></Items>
 					</div>
 				</div>
 			</div>
