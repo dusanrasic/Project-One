@@ -13,7 +13,7 @@ class Items extends Component{
 		
 	}
 	componentDidMount(){
-
+		const dataToken = parseInt(localStorage.getItem('token'));
 		const tokenData = api.get('api/token');
 		if(localStorage.getItem('token') == null){
 			tokenData.then(
@@ -27,10 +27,15 @@ class Items extends Component{
 			const data = api.get('api/data', {
 				params: {
 					from: 1,
-					to: 1000,
-					token: localStorage.getItem('token')
+					to: 20,
+					token: dataToken,
 				}
 			})
+			.then(
+				(res)=>{
+					console.log(res);
+				}
+			);
 		}
 		
 		
