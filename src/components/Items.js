@@ -4,152 +4,108 @@ import '../styles/Items.css';
 import * as token from '../lib/token';
 
 class Items extends Component{
-	
 	constructor(){
 		super();
-		this.state ={
-			items: []
-		}
-		
+		this.items = [];
 	}
-	componentDidMount(){
+	token(){
 		const dataToken = localStorage.getItem('token');
+		if(dataToken === null){
+			this.getToken();
+		}
+		else{
+				this.getData(dataToken);	
+		}
+	}
+	getToken(){
 		const tokenData = api.get('api/token')
 			.then( 
 				(res) => {
-					if (dataToken == null || dataToken !== res.token){
+					const dataToken = localStorage.getItem('token');
+					if (dataToken !== res.token){
 						token.addItemToLocalStorage(res.token);
-						// console.log(res);
-						// console.log(dataToken);
-						getData();
+						this.getData(res.token);
 					} else if(dataToken === res.token){
-						getData();
+						this.getData(res.token);
 					}
 				}
 			);
-			
-		function getData(){
-			if(dataToken !== null){
-				const data = api.get('api/data', {
-					from: 1,
-					to: 20,
-					token: dataToken
-				})
-					.then(
-					(res)=>{
-						const {data} = res;
-						let {index, slot, city, velocity} = data;
-						// let index;
-						// let slot;
-						// let city;
-						// let velocity;
-
-						console.table(data)
-						let items = res.results.map((item) => {
-							index = item.index
-							if(item.slot === null){
-								slot = 0;
-							} else{
-								slot = item.slot;
-							}
-							if(item.city === null){
-								city = "None";
-							} else{
-								city = item.city;
-							}
-							if(item.velocity === null){
-								velocity = 0.00;
-							} else{
-								velocity = item.velocity;
-							}
-							return (
-								<tr>
-									<td>`${index}`</td>
-									<td>`${slot}`</td>
-									<td>`${city}`</td>
-									<td>`${velocity}`</td>
-								</tr>
-							)
-						})
-						});
-						
-						// data.forEach(element => {
-						// 	console.log(element.index);
-						// 	console.log(element.slot);
-						// 	console.log(element.city);
-						// 	console.log(element.velocity);
-						// 	index = element.index;
-						// 	if(element.slot === null){
-						// 		slot = 0;
-						// 	} else{
-						// 		slot = element.slot;
-						// 	}
-						// 	if(element.city === null){
-						// 		city = "None";
-						// 	} else{
-						// 		city = element.city;
-						// 	}
-						// 	if(element.velocity === null){
-						// 		velocity = 0.00;
-						// 	} else{
-						// 		velocity = element.velocity;
-						// 	}
-						// 	return (
-						// 		<tr>
-						// 			<td>`${index}`</td>
-						// 			<td>`${slot}`</td>
-						// 			<td>`${city}`</td>
-						// 			<td>`${velocity}`</td>
-						// 		</tr>
-						// 	)
-						// });
-						
-			}
-		}
-		
-		
-		
-		// fetch(this.base_url)
-		// .then(response => {
-		// 	return response.json();
-		// })
-		// .then(data => {
-		// 	console.log(data.results);
-		// 	let items = data.results.map((item) => {
-		// 		return(
-		// 			<tr>
-		// 				<td></td>
-		// 			</tr>
-		// 			);
-		// 	})
-		// 	console.log(items);
-		// 	this.setState({
-		// 		items: items
-		// 	});
-		// });
 	}
-	
+	getData(token){
+		const data = api.get('api/data', {
+			from: 1,
+			to: 20,
+			token: token
+		})		
+		.then(
+			(res)=>{
+				if(res.status === 400 || res.status === 401 || res.status === 403 || res.status === 500){
+					const {error} = res;
+					this.getToken();
+					console.log(error);
+				} else{
+					const {data} = res;
+					const {token} = res;
+					console.log(token);
+					this.token.addItemToLocalStorage(token);
+					// dataToken = token;
+					let {index, slot, city, velocity} = data;
+					const object = [];
+					console.table(data)
+					let items = data.map((item) => {
+						index = item.index
+						if(item.slot === null){
+							slot = 0;
+						} else{
+							slot = item.slot;
+						}
+						if(item.city === null){
+							city = "None";
+						} else{
+							city = item.city;
+						}
+						if(item.velocity === null){
+							velocity = 0.00;
+						} else{
+							velocity = item.velocity;
+						}
+						return (
+							object.push('<tr><td>`${index}`</td><td>`${slot}`</td><td>`${city}`</td><td>`${velocity}`</td></tr>'),
+							this.setstate({
+								items: object
+							})
+						);
+					})}
+				})
+			}	
+	componentDidMount(){
+			this.token();
+		}	
 	render(){
-		return(
-			<table>
-				<thead>
-					<tr>
-						<th>Index</th>
-						<th>Slot</th>
-						<th>City</th>
-						<th>Velocity</th>
-					</tr>
-				</thead>
-				<tbody>
-					
-				</tbody>
-				<tfoot>
-					<tr>
-						<td colspan="2">React project</td>
-					</tr>
-				</tfoot>
-			</table>
-		);
+		setTimeout(() => {
+			return(
+				<table>
+					<thead>
+						<tr>
+							<th>Index</th>
+							<th>Slot</th>
+							<th>City</th>
+							<th>Velocity</th>
+						</tr>
+					</thead>
+					<tbody>
+						{this.state.items}
+					</tbody>
+					<tfoot>
+						<tr>
+							<td>React project</td>
+						</tr>
+					</tfoot>
+				</table>
+			);
+		},5000)
+		return "";
+		
 	}
 }
 export default Items;
