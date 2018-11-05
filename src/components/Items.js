@@ -1,111 +1,133 @@
 import React, { Component } from 'react';
 import * as api from '../lib/api';
 import '../styles/Items.css';
-import * as token from '../lib/token';
+import {addItemToLocalStorage} from '../lib/token';
 
 class Items extends Component{
 	constructor(){
 		super();
-		this.items = [];
+		this.state = {
+			items: []
+		}
 	}
-	token(){
+
+	componentDidMount(){
+		this.initApp();
+	}	
+
+	initApp = () => {
 		const dataToken = localStorage.getItem('token');
-		if(dataToken === null){
+		if(!dataToken){
 			this.getToken();
 		}
 		else{
-				this.getData(dataToken);	
+			this.getData(dataToken);	
 		}
 	}
-	getToken(){
-		const tokenData = api.get('api/token')
+
+	getToken = () => {
+		api.get('api/token')
 			.then( 
 				(res) => {
-					const dataToken = localStorage.getItem('token');
-					if (dataToken !== res.token){
-						token.addItemToLocalStorage(res.token);
-						this.getData(res.token);
-					} else if(dataToken === res.token){
-						this.getData(res.token);
-					}
+					addItemToLocalStorage(res.token);
+					this.getData(res.token);
 				}
 			);
 	}
-	getData(token){
-		const data = api.get('api/data', {
+
+	getData = (token) => {
+		api.get('api/data', {
 			from: 1,
 			to: 20,
 			token: token
 		})		
 		.then(
 			(res)=>{
-				if(res.status === 400 || res.status === 401 || res.status === 403 || res.status === 500){
-					const {error} = res;
-					this.getToken();
-					console.log(error);
-				} else{
-					const {data} = res;
-					const {token} = res;
-					console.log(token);
-					this.token.addItemToLocalStorage(token);
-					// dataToken = token;
-					let {index, slot, city, velocity} = data;
-					const object = [];
-					console.table(data)
-					let items = data.map((item) => {
-						index = item.index
-						if(item.slot === null){
-							slot = 0;
-						} else{
-							slot = item.slot;
-						}
-						if(item.city === null){
-							city = "None";
-						} else{
-							city = item.city;
-						}
-						if(item.velocity === null){
-							velocity = 0.00;
-						} else{
-							velocity = item.velocity;
-						}
-						return (
-							object.push('<tr><td>`${index}`</td><td>`${slot}`</td><td>`${city}`</td><td>`${velocity}`</td></tr>'),
-							this.setstate({
-								items: object
-							})
-						);
-					})}
-				})
-			}	
-	componentDidMount(){
-			this.token();
-		}	
-	render(){
-		setTimeout(() => {
-			return(
-				<table>
-					<thead>
-						<tr>
-							<th>Index</th>
-							<th>Slot</th>
-							<th>City</th>
-							<th>Velocity</th>
-						</tr>
-					</thead>
-					<tbody>
-						{this.state.items}
-					</tbody>
-					<tfoot>
-						<tr>
-							<td>React project</td>
-						</tr>
-					</tfoot>
-				</table>
-			);
-		},5000)
-		return "";
+				const {token, data} = res;
+				addItemToLocalStorage(token);
+				
+				this.setState({
+					items: data
+				});
+			}
+		).catch(error => {
+			const {status} = error;
+			if(status){
+				setTimeout(() => {
+					this.getToken()
+				}, 30000);
+			}
+			
+		});
+	}
+
+	renderItems = () => {
+		const {items} = this.state;
+
+		if(items && !items.length) {
+			return "Loading..."
+
+		}
+		return items.map(this.renderItem);
+	}
+
+	renderItem = (value, key) => {
+		const {index, slot, city, velocity} = value;
+		let sl1,ci1,vel1;
+		if(slot == null){
+			sl1 = 0;
+			ci1 = city;
+			vel1 = velocity;
+		} else if(city == null){
+			sl1 = slot;
+			ci1 = "None";
+			vel1 = velocity;
+		} else if(velocity == null){
+			sl1 = slot;
+			ci1 = city;
+			vel1 = 0.00;
+		} else{
+			sl1 = slot;
+			ci1 = city;
+			vel1 = velocity;
+		}
 		
+		
+		if(!value) {
+			return;
+		}
+
+		return (
+			<tr key={`listItem_${key}`}>
+				<td>{index}</td>
+				<td>{sl1}</td>
+				<td>{ci1}</td>
+				<td>{vel1}</td>
+			</tr>
+		);
+	}
+
+	render(){
+		return(
+			<table>
+				<thead>
+					<tr>
+						<th>Index</th>
+						<th>Slot</th>
+						<th>City</th>
+						<th>Velocity</th>
+					</tr>
+				</thead>
+				<tbody>
+					{this.renderItems()}
+				</tbody>
+				<tfoot>
+					<tr>
+						
+					</tr>
+				</tfoot>
+			</table>
+		);
 	}
 }
 export default Items;

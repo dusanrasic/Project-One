@@ -19,6 +19,7 @@ export const request = opts => {
 			let response = res.response;
 			if (response && response.data && response.data.error) {
 				err = response.data.error;
+				err.status = response.status;
 			} else if (response) {
 				err = new Error(response.statusText);
 				err.status = response.status;
