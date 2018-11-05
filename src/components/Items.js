@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import * as api from '../lib/api';
 import '../styles/Items.css';
-import {addItemToLocalStorage} from '../lib/token';
 
 class Items extends Component{
 	constructor(){
 		super();
 		this.state = {
-			items: []
+			items: [],
+			token: ""
 		}
 	}
 
@@ -16,7 +16,7 @@ class Items extends Component{
 	}	
 
 	initApp = () => {
-		const dataToken = localStorage.getItem('token');
+		const dataToken = this.state.token;
 		if(!dataToken){
 			this.getToken();
 		}
@@ -29,7 +29,9 @@ class Items extends Component{
 		api.get('api/token')
 			.then( 
 				(res) => {
-					addItemToLocalStorage(res.token);
+					this.setState({
+						token: res.token
+					});
 					this.getData(res.token);
 				}
 			);
@@ -44,20 +46,31 @@ class Items extends Component{
 		.then(
 			(res)=>{
 				const {token, data} = res;
-				addItemToLocalStorage(token);
+				this.setState({
+					token: token
+				});
 				
 				this.setState({
 					items: data
 				});
 			}
 		).catch(error => {
-			const {status} = error;
-			if(status){
-				setTimeout(() => {
-					this.getToken()
-				}, 30000);
-			}
-			
+			let {status} = error;
+			if(status === 400){
+				this.getData(this.state.token);
+			}else if(status === 401){
+				this.setState({
+					token: ""
+				});
+				this.getToken();
+			}else if(status === 403){
+				setTimeout(() => {this.setState({token: ""}); this.getToken(); console.clear();}, 30000);
+			}else if(status === 500){
+				this.setState({
+					token: ""
+				});
+				this.getToken();
+			}			
 		});
 	}
 
@@ -72,37 +85,21 @@ class Items extends Component{
 	}
 
 	renderItem = (value, key) => {
-		const {index, slot, city, velocity} = value;
-		let sl1,ci1,vel1;
-		if(slot == null){
-			sl1 = 0;
-			ci1 = city;
-			vel1 = velocity;
-		} else if(city == null){
-			sl1 = slot;
-			ci1 = "None";
-			vel1 = velocity;
-		} else if(velocity == null){
-			sl1 = slot;
-			ci1 = city;
-			vel1 = 0.00;
-		} else{
-			sl1 = slot;
-			ci1 = city;
-			vel1 = velocity;
-		}
-		
-		
 		if(!value) {
 			return;
 		}
 
+		let {index, slot, city, velocity} = value;
+		slot = !slot ? 0 : slot;
+		city = !city ? "None" : city;
+		velocity = !velocity ? 0.00 : velocity;
+
 		return (
 			<tr key={`listItem_${key}`}>
 				<td>{index}</td>
-				<td>{sl1}</td>
-				<td>{ci1}</td>
-				<td>{vel1}</td>
+				<td>{slot}</td>
+				<td>{city}</td>
+				<td>{velocity}</td>
 			</tr>
 		);
 	}
