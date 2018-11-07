@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import * as api from '../lib/api';
+import {getData, getToken} from '../lib/itm';
 import '../styles/Items.css';
 
 class Items extends Component{
@@ -7,73 +7,55 @@ class Items extends Component{
 		super();
 		this.state = {
 			items: [],
-			token: ""
+			token: null,
+			error: null,
+			initialized: false,
 		}
 	}
 
 	componentDidMount(){
 		this.initApp();
-	}	
-
-	initApp = () => {
-		const dataToken = this.state.token;
-		if(!dataToken){
-			this.getToken();
-		}
-		else{
-			this.getData(dataToken);	
-		}
 	}
 
-	getToken = () => {
-		api.get('api/token')
-			.then( 
+	componentDidUpdate(prevProps, prevState) {
+		const {token, initialized, items} = this.state;
+		if (token !== prevState.token && initialized && !items.length) {
+			getData(token, 1, 20)
+			.then(
 				(res) => {
 					this.setState({
-						token: res.token
-					});
-					this.getData(res.token);
+						token: res.token,
+						items: res.data
+					})
 				}
-			);
+			)
+			.catch((error) => {
+				this.setState({
+					error
+				})
+			})
+		}
 	}
 
-	getData = (token) => {
-		api.get('api/data', {
-			from: 1,
-			to: 20,
-			token: token
-		})		
-		.then(
-			(res)=>{
-				const {token, data} = res;
+	initApp(){
+		const dataToken = this.state.token;
+		if(!dataToken){
+			getToken()
+			.then(
+				(res) => {
+					this.setState({
+						token: res.token,
+						initialized: true,
+					})			
+				}
+			).catch((err) => {
 				this.setState({
-					token: token
-				});
-				
-				this.setState({
-					items: data
-				});
-			}
-		).catch(error => {
-			let {status} = error;
-			if(status === 400){
-				this.getData(this.state.token);
-			}else if(status === 401){
-				this.setState({
-					token: ""
-				});
-				this.getToken();
-			}else if(status === 403){
-				setTimeout(() => {this.setState({token: ""}); this.getToken(); console.clear();}, 30000);
-			}else if(status === 500){
-				this.setState({
-					token: ""
-				});
-				this.getToken();
-			}			
-		});
+					error: true,
+					token: null
+				})
+			})
+		}
 	}
-
 	renderItems = () => {
 		const {items} = this.state;
 

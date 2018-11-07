@@ -11,7 +11,7 @@ class Body extends Component{
 			<div className="Body">
 				<div className="wrapper">
 					<div className="row1">
-						<form id="loadForm">
+						<form id="loadForm" >
 							<label htmlFor="from">From:</label>
 							<input type="text" className="inputFromText"/>
 							<label htmlFor="to">To:</label>
