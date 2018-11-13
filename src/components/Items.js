@@ -3,24 +3,55 @@ import {getData, getToken} from '../lib/itm';
 import '../styles/Items.css';
 
 class Items extends Component{
-	constructor(){
-		super();
+	constructor(props){
+		super(props);
 		this.state = {
 			items: [],
 			token: null,
 			error: null,
 			initialized: false,
+			from: props.query.from,
+			to: props.query.to
 		}
 	}
 
 	componentDidMount(){
 		this.initApp();
 	}
-
-	componentDidUpdate(prevProps, prevState) {
-		const {token, initialized, items} = this.state;
-		if (token !== prevState.token && initialized && !items.length) {
-			getData(token, 1, 20)
+	static getDerivedStateFromProps(props, state){
+		const {token, from, to} = state;
+		if(props.list !== state.prevPropsList || state.prevFrom !== state.from || state.prevTo !== state.to){
+			getData(token, from, to)
+			.then(
+				(res) => {
+					return {
+						prevPropsList: props.list,
+						prevFrom: state.from,
+						prevTo: state.to,
+						items: res.data
+					}
+					// this.setState({
+					// 	token: res.token,
+					// 	items: res.data
+					// })
+				}
+			)
+			.catch((error) => {
+				// this.setState({
+				// 	error
+				// })
+				return {
+					error: error
+				}
+			});
+		}
+		return null;
+	}
+	componentDidUpdate(prevProps, prevState) {		
+		const {token, initialized, items, from, to} = this.state;
+		const shouldFetch = (token !== prevState.token && initialized && !items.length );
+		if (shouldFetch) {
+			getData(token, from, to)
 			.then(
 				(res) => {
 					this.setState({
@@ -36,7 +67,6 @@ class Items extends Component{
 			})
 		}
 	}
-
 	initApp(){
 		const dataToken = this.state.token;
 		if(!dataToken){
@@ -86,7 +116,7 @@ class Items extends Component{
 		);
 	}
 
-	render(){
+	render(){		
 		return(
 			<table>
 				<thead>
