@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import {getData, getToken} from '../lib/itm';
 import '../styles/Items.css';
 
+// TODO: check redux
+// TODO: check thunk
+// TODO: check token api
 class Items extends Component{
 	constructor(props){
 		super(props);
@@ -35,6 +38,7 @@ class Items extends Component{
 				this.setState({
 					error
 				})
+				this.handleError(error);
 			});
 		}
 	}
@@ -55,6 +59,7 @@ class Items extends Component{
 				this.setState({
 					error
 				})
+				this.handleError(error);
 			})
 		}
 	}
@@ -74,11 +79,12 @@ class Items extends Component{
 					error: true,
 					token: null
 				})
+				this.handleError(err);
 			})
 		}
 	}
 	renderItems = () => {
-		const {items} = this.state;
+		const {items, error} = this.state;
 
 		if(items && !items.length) {
 			return "Loading..."
@@ -106,7 +112,51 @@ class Items extends Component{
 			</tr>
 		);
 	}
-
+	handleError(error){
+		let {status} = error;
+		let {token, from, to} = this.state;
+		if (status === 400) {
+			getData(token, from, to)
+			.then(
+				(res) => {
+					this.setState({
+						token: res.token,
+						items: res.data
+					})
+				}
+			)
+		} else if (status === 401) {
+			getToken()
+			.then(
+				(res) => {
+					this.setState({
+						token: res.token,
+						initialized: true,
+					})			
+				}
+			);
+		} else if (status === 403) {
+			setTimeout(() => {
+				getToken()
+				.then(
+				(res) => {
+					this.setState({
+						token: res.token,
+						initialized: true,
+					})			
+				}
+			);}, 30000);;
+		} else if (status === 500) {
+			getToken()
+			.then(
+				(res) => {
+					this.setState({
+						token: res.token,
+						initialized: true,
+					})			
+				});
+		}
+	}
 	render(){		
 		return(
 			<table>
