@@ -16,7 +16,7 @@ class Body extends Component{
 	}
 	handleSubmit = (event) => {
 		event.preventDefault();
-		let {q} = {
+		let q = {
 			to: this.state.inputToText,
 			from: this.state.inputFromText
 		};

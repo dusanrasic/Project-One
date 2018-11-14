@@ -18,34 +18,25 @@ class Items extends Component{
 	componentDidMount(){
 		this.initApp();
 	}
-	static getDerivedStateFromProps(props, state){
-		const {token, from, to} = state;
-		if(props.list !== state.prevPropsList || state.prevFrom !== state.from || state.prevTo !== state.to){
+	componentWillReceiveProps(nextProps){
+		const {token} = this.state;
+		const {from, to} = nextProps.query;
+		if(nextProps.query !== this.props.query){
 			getData(token, from, to)
 			.then(
 				(res) => {
-					return {
-						prevPropsList: props.list,
-						prevFrom: state.from,
-						prevTo: state.to,
+					this.setState({
+						token: res.token,
 						items: res.data
-					}
-					// this.setState({
-					// 	token: res.token,
-					// 	items: res.data
-					// })
+					})
 				}
 			)
 			.catch((error) => {
-				// this.setState({
-				// 	error
-				// })
-				return {
-					error: error
-				}
+				this.setState({
+					error
+				})
 			});
 		}
-		return null;
 	}
 	componentDidUpdate(prevProps, prevState) {		
 		const {token, initialized, items, from, to} = this.state;
