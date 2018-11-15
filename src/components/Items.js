@@ -2,119 +2,47 @@ import React, { Component } from 'react';
 import {getData, getToken} from '../lib/itm';
 import '../styles/Items.css';
 import {connect} from 'react-redux';
-import {fetchToken} from '../actions/itemActions';
+import {fetchToken, fetchData} from '../actions/itemActions';
 
 // TODO: check redux
 // TODO: check thunk
 // TODO: check token api
 class Items extends Component{
-	constructor(props){
-		super(props);
-		// this.state = {
-		// 	items: [],
-		// 	token: null,
-		// 	error: null,
-		// 	initialized: false,
-		// 	from: props.query.from,
-		// 	to: props.query.to
-		// }
-	}
-
 	componentDidMount(){
 		this.initApp();
 	}
-	componentWillReceiveProps(nextProps){
-		const {token} = this.state;
-		const {from, to} = nextProps.query;
-		if(nextProps.query !== this.props.query){
-			getData(token, from, to)
-			.then(
-				(res) => {
-					this.setState({
-						token: res.token,
-						items: res.data
-					})
-				}
-			)
-			.catch((error) => {
-				this.setState({
-					error
-				})
-				this.handleError(error);
-			});
-		}
-	}
-	componentDidUpdate(prevProps, prevState) {		
-		const {token, initialized, items, from, to} = this.state;
-		const shouldFetch = (token !== prevState.token && initialized && !items.length );
-		if (shouldFetch) {
-			getData(token, from, to)
-			.then(
-				(res) => {
-					this.setState({
-						token: res.token,
-						items: res.data
-					})
-				}
-			)
-			.catch((error) => {
-				this.setState({
-					error
-				})
-				this.handleError(error);
-			})
-		}
-	}
 	initApp(){
-		// const dataToken = this.state.token;
-		// if(!dataToken){
-		// 	getToken()
-		// 	.then(
-		// 		(res) => {
-		// 			this.setState({
-		// 				token: res.token,
-		// 				initialized: true,
-		// 			})			
-		// 		}
-		// 	).catch((err) => {
-		// 		this.setState({
-		// 			error: true,
-		// 			token: null
-		// 		})
-		// 		this.handleError(err);
-		// 	})
-		// }
 		this.props.fetchToken();
 	}
-	// renderItems = () => {
-	// 	const {items, error} = this.state;
+	renderItems = () => {
+		const {items} = this.props;
 
-	// 	if(items && !items.length) {
-	// 		return "Loading..."
+		if(items && !items.length) {
+			return "Loading..."
 
-	// 	}
-	// 	return items.map(this.renderItem);
-	// }
+		}
+		return items.map(this.renderItem);
+	}
 
-	// renderItem = (value, key) => {
-	// 	if(!value) {
-	// 		return;
-	// 	}
+	renderItem = (value, key) => {
+		if(!value) {
+			return;
+		}
 
-	// 	let {index, slot, city, velocity} = value;
-	// 	slot = !slot ? 0 : slot;
-	// 	city = !city ? "None" : city;
-	// 	velocity = !velocity ? 0.00 : velocity;
+		let {index, slot, city, velocity} = value;
+		slot = !slot ? 0 : slot;
+		city = !city ? "None" : city;
+		velocity = !velocity ? 0.00 : velocity;
 
-	// 	return (
-	// 		<tr key={`listItem_${key}`}>
-	// 			<td>{index}</td>
-	// 			<td>{slot}</td>
-	// 			<td>{city}</td>
-	// 			<td>{velocity}</td>
-	// 		</tr>
-	// 	);
-	// }
+		return (
+			<tr key={`listItem_${key}`}>
+				<td>{index}</td>
+				<td>{slot}</td>
+				<td>{city}</td>
+				<td>{velocity}</td>
+			</tr>
+		);
+	}
 	
 	render(){		
 		return(
@@ -128,7 +56,7 @@ class Items extends Component{
 					</tr>
 				</thead>
 				<tbody>
-					{/* {this.renderItems()} */}
+					{this.renderItems()}
 				</tbody>
 				<tfoot>
 					<tr>
@@ -140,6 +68,10 @@ class Items extends Component{
 	}
 }
 const mapDispatchToProps = {
-	fetchToken: fetchToken
+	fetchToken: fetchToken,
+	fetchData: fetchData
 }
-export default connect(null, mapDispatchToProps)(Items);
+const mapStateToProps = state => ({
+	items: state.items.items
+})
+export default connect(mapStateToProps, mapDispatchToProps)(Items);
