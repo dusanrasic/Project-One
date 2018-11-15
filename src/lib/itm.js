@@ -1,8 +1,8 @@
 import * as api from '../lib/api';
 
-export const getToken = () => {
-	return api.get('api/token');
-}
+// export const getToken = () => {
+// 	return api.get('api/token');
+// }
 
 export const getData = (token, f, t) => {
 	return new Promise((resolve, reject) => {
@@ -17,16 +17,6 @@ export const getData = (token, f, t) => {
 			}
 		).catch(error => {
 			reject(error);
-			// let {status} = error;
-			// if (status === 400) {
-			// 	getData(token, 1, 20);
-			// } else if (status === 401) {
-			// 	getToken();
-			// } else if (status === 403) {
-			// 	setTimeout(() => {this.getToken();}, 30000);;
-			// } else if (status === 500) {
-			// 	getToken();
-			// }
 		});
 	});
 	

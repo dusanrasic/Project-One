@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import '../styles/Navigation.css';
 
 class Navigaion extends Component{
-	constructor(){
-		super();
-	}
+	// constructor(){
+	// 	super();
+	// }
 	render(){
 		return(
 			<nav className="Navigation">

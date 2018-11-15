@@ -2,20 +2,18 @@ import React, { Component } from 'react';
 import '../styles/App.css';
 import Navigation from './Navigation';
 import Body from './Body';
-
+import { Provider} from 'react-redux';
+import store from '../lib/store';
 class App extends Component {
-  constructor(){
-    super();
-    this.state = {
-      results: {}
-    }
-  }
+  
   render() {
     return (
-      <div className="App">
-        <Navigation />
-        <Body />
-      </div>
+      <Provider store={store}>
+        <div className="App">
+          <Navigation />
+          <Body />
+        </div>
+      </Provider>
     );
   }
 }
