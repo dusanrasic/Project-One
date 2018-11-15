@@ -10,6 +10,9 @@ export const fetchToken = () => dispatch => {
 		});
 		dispatch(fetchData(res.token))
 	})
+	.catch((error) => {
+		return error;
+	})
 }
 export const fetchData = (token, f=1, t=20) => dispatch => {
 	api.get('api/data', {
@@ -21,5 +24,8 @@ export const fetchData = (token, f=1, t=20) => dispatch => {
 		type: FETCH_ITEMS,
 		payload: res.data,
 		token: res.token
-	}));
+	}))
+	.catch((error) => {
+		return error;
+	})	
 }

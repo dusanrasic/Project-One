@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import '../styles/Body.css';
 import Items from './Items';
+import PropTypes from 'prop-types';
+import {connect} from 'react-redux';
+import {fetchData} from '../actions/itemActions';
 
 class Body extends Component{
 	constructor(){
@@ -8,30 +11,19 @@ class Body extends Component{
 		this.state = {
 			inputFromText: 1,
 			inputToText : 20,
-			query: {
-				from: 1,
-				to: 20
-			}
 		}
 	}
 	handleSubmit = (event) => {
 		event.preventDefault();
-		let q = {
-			to: this.state.inputToText,
-			from: this.state.inputFromText
-		};
-		this.setState({
-			query : q
-		});
+		const {token} = this.props;
+		let {inputFromText, inputToText} = this.state;
+		this.props.fetchData(token, inputFromText, inputToText)
 	}
 	handleInputChange = (event) => {
 		event.preventDefault();
-
-		switch(event.target.name){
-			case 'inputFromText': return this.setState({[event.target.name]: event.target.value}); break;
-			case 'inputToText': return this.setState({[event.target.name]: event.target.value}); break;
-			default: break;
-		}		
+		this.setState({
+			[event.target.name]:event.target.value
+		});	
 	}
 	render(){		
 		return(
@@ -47,11 +39,20 @@ class Body extends Component{
 						</form>
 					</div>
 					<div className="row2">
-						<Items query={this.state.query}/>
+						<Items/>
 					</div>
 				</div>
 			</div>
 		);
 	}
 }
-export default Body;
+Body.propTypes =  {
+	fetchData: PropTypes.func.isRequired,
+}
+const mapDispatchToProps = {
+	fetchData: fetchData
+}
+const mapStateToProps = state => ({
+	token: state.items.token
+})
+export default connect(mapStateToProps, mapDispatchToProps )(Body);

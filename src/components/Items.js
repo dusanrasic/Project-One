@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
-import {getData, getToken} from '../lib/itm';
+import PropTypes from 'prop-types';
 import '../styles/Items.css';
 import {connect} from 'react-redux';
 import {fetchToken, fetchData} from '../actions/itemActions';
 
-// TODO: check redux
-// TODO: check thunk
-// TODO: check token api
 class Items extends Component{
 	componentDidMount(){
 		this.initApp();
@@ -66,6 +63,11 @@ class Items extends Component{
 			</table>
 		);
 	}
+}
+Items.propTypes =  {
+	fetchToken: PropTypes.func.isRequired,
+	fetchData: PropTypes.func.isRequired,
+	items: PropTypes.array.isRequired
 }
 const mapDispatchToProps = {
 	fetchToken: fetchToken,
