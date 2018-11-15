@@ -1,4 +1,4 @@
-import { FETCH_ITEMS, FETCH_TOKEN } from './types';
+import { FETCH_ITEMS, FETCH_TOKEN, FETCH_ITEMS_ERROR, FETCH_TOKEN_ERROR } from './types';
 import * as api from '../lib/api';
 
 export const fetchToken = () => dispatch => {		
@@ -11,7 +11,12 @@ export const fetchToken = () => dispatch => {
 		dispatch(fetchData(res.token))
 	})
 	.catch((error) => {
-		return error;
+		let err = handleError(error);
+		dispatch({
+			type: FETCH_TOKEN_ERROR,
+			payload: {error, err},
+			
+		})
 	})
 }
 export const fetchData = (token, f=1, t=20) => dispatch => {
@@ -22,10 +27,21 @@ export const fetchData = (token, f=1, t=20) => dispatch => {
 	})
 	.then(res => dispatch({
 		type: FETCH_ITEMS,
-		payload: res.data,
-		token: res.token
+		payload: {
+			data: res.data,
+			token:res.token
+		},
 	}))
 	.catch((error) => {
-		return error;
+		let err = handleError(error);
+		dispatch({
+			type: FETCH_ITEMS_ERROR,
+			payload: {error, err}
+		})
 	})	
+}
+const handleError = (error) => {
+	if(error.status == 401 || error.status == 403 || error.status == 500){
+		return null;
+	}
 }
