@@ -41,7 +41,7 @@ export const fetchData = (token, f=1, t=20) => dispatch => {
 	})	
 }
 const handleError = (error) => {
-	if(error.status == 401 || error.status == 403 || error.status == 500){
+	if(error.status === 401 || error.status === 403 || error.status === 500){
 		return null;
 	}
 }
